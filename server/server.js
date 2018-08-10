@@ -18,7 +18,7 @@ app.post('/todos', (req, res) => {
     });
 
     todo.save().then((doc) => {
-        res.send(doc);
+        res.status(200).send(doc);
     }, (e) => {
         res.status(400).send(e);
     });
@@ -26,9 +26,17 @@ app.post('/todos', (req, res) => {
 
 app.get('/todos', (req, res) => {
     Todo.find({}).then((todos) => {
-        res.send({
+        res.status(200).send({
             todos
         })
+    }, (e) => {
+        res.status(400).send(e);
+    });
+});
+
+app.get('/', (req, res) => {
+    Todo.find({}).then((todos) => {
+        res.status(200).send();
     }, (e) => {
         res.status(400).send(e);
     });
@@ -45,7 +53,24 @@ app.get('/todos/:id', (req, res) => {
         if(!todo) {
             return res.status(404).send(); 
         }
-        res.send({todo});
+        res.status(200).send({todo});
+    }).catch((e) => {
+        res.status(400).send();
+    });
+});
+
+app.delete('/todos/:id', (req, res) => {
+    var id = req.params.id;
+    
+    if(!ObjectID.isValid(id)) {
+        return res.status(404).send();
+    }
+
+    Todo.findByIdAndRemove(id).then((todo) => {
+        if(!todo) {
+            return res.status(404).send(); 
+        }
+        res.status(200).send({todo});
     }).catch((e) => {
         res.status(400).send();
     });
